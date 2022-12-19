@@ -36,7 +36,8 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final TextEditingController _controller = TextEditingController();
-  
+  Socket? socket;
+
   @override
   void initState() {
     // TODO: implement initState
@@ -48,32 +49,21 @@ class _MyHomePageState extends State<MyHomePage> {
     log("here");
     int counter = 0;
     try {
-      Socket socket = await Socket.connect(
-        '172.20.10.8',
+      socket = await Socket.connect(
+        '192.168.192.114',
         8000,
         timeout: const Duration(seconds: 10)
       );
       log('connected');
 
       // listen to the received data event stream
-      socket.listen((List<int> event) {
+      socket!.listen((List<int> event) {
         log("${counter++} here");
         log(utf8.decode(event));
       });
 
       // send hello
-      socket.add(utf8.encode('hello'));
-      Map<String, String> body = {
-        "name": "Ibrohim",
-        "password": "12345678"
-      };
-      socket.add(utf8.encode(body.toString()));
-
-      // wait 5 seconds
-      await Future.delayed(const Duration(seconds: 5));
-
-      // .. and close the socket
-      //socket.close();
+      _sendMessage();
     } catch(error, stackTrace) {
       log(error.toString());
       log(stackTrace.toString());
@@ -111,9 +101,11 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _sendMessage() {
-    if (_controller.text.isNotEmpty) {
-      
+    String str = _controller.text;
+    if (_controller.text.isEmpty) {
+      str = "Connected hello server!!!";
     }
+    socket!.add(utf8.encode(str));
   }
 
   @override
