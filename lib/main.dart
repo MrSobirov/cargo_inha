@@ -46,6 +46,7 @@ class _MyHomePageState extends State<MyHomePage> {
   
   Future<void> socketConnect() async {
     log("here");
+    int counter = 0;
     try {
       Socket socket = await Socket.connect(
         '172.20.10.8',
@@ -61,7 +62,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
       // send hello
       socket.add(utf8.encode('hello'));
-      socket.add(utf8.encode('hello2'));
+      Map<String, String> body = {
+        "name": "Ibrohim",
+        "password": "12345678"
+      };
+      socket.add(utf8.encode(body.toString()));
 
       // wait 5 seconds
       await Future.delayed(const Duration(seconds: 5));
