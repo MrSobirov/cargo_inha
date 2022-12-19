@@ -57,6 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
       // listen to the received data event stream
       socket.listen((List<int> event) {
+        log("${counter++} here");
         log(utf8.decode(event));
       });
 
