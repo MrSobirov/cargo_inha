@@ -8,40 +8,42 @@ class Login extends StatefulWidget {
   @override
   State<Login> createState() => _LoginState();
 }
-int tabTextIndexSelected = 0;
-final TextEditingController phone = TextEditingController();
-final TextEditingController name = TextEditingController();
 
-bool openingDemoStore(BuildContext ctx) {
-  bool needDemo = false;
-  showDialog<void>(
-    context: ctx,
-    builder: (BuildContext contextDialog) {
-      return WillPopScope(
-        onWillPop: () async {
-          Navigator.push;
-          return false;
-        },
-        child: AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(28))),
-          title: Text(
-            "Login error !",
-            textAlign: TextAlign.center,
-            style: TextStyle(
-                color: Colors.black,
-                fontSize: 18
+class _LoginState extends State<Login> {
+  int tabTextIndexSelected = 0;
+  final TextEditingController phone = TextEditingController();
+  final TextEditingController name = TextEditingController();
+
+  bool openingDemoStore(BuildContext ctx) {
+    bool needDemo = false;
+    showDialog<void>(
+      context: ctx,
+      builder: (BuildContext contextDialog) {
+        return WillPopScope(
+          onWillPop: () async {
+            Navigator.push;
+            return false;
+          },
+          child: AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(28))),
+            title: Text(
+              "Login error !",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 18
+              ),
             ),
-          ),
-          content: Text(
-            "Email or password was incorrect\nPlease try again !.",
-            //textAlign: TextAlign.center,
-            style: TextStyle(
-                color: Colors.black,
-                fontSize: 15
+            content: Text(
+              "Email or password was incorrect\nPlease try again !.",
+              //textAlign: TextAlign.center,
+              style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 15
+              ),
             ),
-          ),
-          actions: <Widget>[
-            /*TextButton(
+            actions: <Widget>[
+              /*TextButton(
                 style: TextButton.styleFrom(textStyle: Theme.of(contextDialog).textTheme.labelLarge,),
                 child: Text(
                   'Check demo',
@@ -56,28 +58,28 @@ bool openingDemoStore(BuildContext ctx) {
                   needDemo = true;
                 },
               ),*/
-            TextButton(
-              style: TextButton.styleFrom(textStyle: Theme.of(contextDialog).textTheme.labelLarge,),
-              child: Text(
-                'OK',
-                style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.blueAccent
+              TextButton(
+                style: TextButton.styleFrom(textStyle: Theme.of(contextDialog).textTheme.labelLarge,),
+                child: Text(
+                  'OK',
+                  style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.blueAccent
+                  ),
                 ),
+                onPressed: () {
+                  Navigator.pop(ctx);
+                },
               ),
-              onPressed: () {
-                Navigator.pop(ctx);
-              },
-            ),
-          ],
-        ),
-      );
-    },
-  );
-  return needDemo;
-}
-class _LoginState extends State<Login> {
+            ],
+          ),
+        );
+      },
+    );
+    return needDemo;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

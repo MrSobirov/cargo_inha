@@ -6,8 +6,6 @@ import 'dart:async';
 import 'package:cargo_inha/login.dart';
 import 'package:flutter/material.dart';
 
-import 'driver.dart';
-
 void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
@@ -39,6 +37,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final TextEditingController _controller = TextEditingController();
   Socket? socket;
+  String data = "No data";
 
   @override
   void initState() {
@@ -49,7 +48,6 @@ class _MyHomePageState extends State<MyHomePage> {
   
   Future<void> socketConnect() async {
     log("here");
-    int counter = 0;
     try {
       socket = await Socket.connect(
         '192.168.192.114',
@@ -60,12 +58,14 @@ class _MyHomePageState extends State<MyHomePage> {
 
       // listen to the received data event stream
       socket!.listen((List<int> event) {
-        log("${counter++} here");
-        log(utf8.decode(event));
+        log("Result here: ${event.isEmpty}");
+        log(event.toString());
+        final List<int> charCodes = event;
+        log(charCodes.toString());
+        data = String.fromCharCodes(charCodes);
+        log("Data $data");
+        setState(() {});
       });
-
-      // send hello
-      _sendMessage();
     } catch(error, stackTrace) {
       log(error.toString());
       log(stackTrace.toString());
@@ -111,7 +111,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _sendMessage() {
     String str = _controller.text;
-    if (_controller.text.isEmpty) {
+    str = "SELECT JSON_ARRAYAGG(JSON_OBJECT('name', name, 'id', orderID)) from orders";
+    if(_controller.text.isEmpty) {
       str = "Connected hello server!!!";
     }
     socket!.add(utf8.encode(str));
