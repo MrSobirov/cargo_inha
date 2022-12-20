@@ -1,3 +1,4 @@
+import 'package:cargo_inha/admin.dart';
 import 'package:cargo_inha/driver.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_toggle_tab/flutter_toggle_tab.dart';
@@ -10,7 +11,72 @@ class Login extends StatefulWidget {
 int tabTextIndexSelected = 0;
 final TextEditingController phone = TextEditingController();
 final TextEditingController name = TextEditingController();
-final TextEditingController surname = TextEditingController();
+
+bool openingDemoStore(BuildContext ctx) {
+  bool needDemo = false;
+  showDialog<void>(
+    context: ctx,
+    builder: (BuildContext contextDialog) {
+      return WillPopScope(
+        onWillPop: () async {
+          Navigator.push;
+          return false;
+        },
+        child: AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(28))),
+          title: Text(
+            "Login error !",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+                color: Colors.black,
+                fontSize: 18
+            ),
+          ),
+          content: Text(
+            "Email or password was incorrect\nPlease try again !.",
+            //textAlign: TextAlign.center,
+            style: TextStyle(
+                color: Colors.black,
+                fontSize: 15
+            ),
+          ),
+          actions: <Widget>[
+            /*TextButton(
+                style: TextButton.styleFrom(textStyle: Theme.of(contextDialog).textTheme.labelLarge,),
+                child: Text(
+                  'Check demo',
+                  style: TextStyle(
+                      fontSize: 15.sp,
+                      fontWeight: FontWeight.w600,
+                      color: MyColors.primary
+                  ),
+                ),
+                onPressed: () async {
+                  Navigator.pop(contextDialog);
+                  needDemo = true;
+                },
+              ),*/
+            TextButton(
+              style: TextButton.styleFrom(textStyle: Theme.of(contextDialog).textTheme.labelLarge,),
+              child: Text(
+                'OK',
+                style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.blueAccent
+                ),
+              ),
+              onPressed: () {
+                Navigator.pop(ctx);
+              },
+            ),
+          ],
+        ),
+      );
+    },
+  );
+  return needDemo;
+}
 class _LoginState extends State<Login> {
   @override
   Widget build(BuildContext context) {
@@ -48,7 +114,7 @@ class _LoginState extends State<Login> {
                       color: Colors.black87,
                       fontSize: 18,
                       fontWeight: FontWeight.w300),
-                  labels: ['Driver','Admin'],
+                  labels: ['Admin','Driver'],
                   selectedLabelIndex: (index) {
                     setState(() {
                       tabTextIndexSelected = index;
@@ -134,8 +200,25 @@ class _LoginState extends State<Login> {
                       ),
                     ),
                     onPressed: ()  {
-                      Navigator.push(context, MaterialPageRoute(builder: (_) => Driver()));
+                      /*if(tabTextIndexSelected == 1 ) {
+                        if(name.text == "Muhammadsaid" && phone.text == "993466246"){
+                          Navigator.push(context, MaterialPageRoute(builder: (_) => Driver()));
+                        }
+                        else {
+                          openingDemoStore(context);
+                        }
+                      }
+                      else {
+                        if(name.text == "Muhammadsaid" && phone.text == "993466246") {
+                          Navigator.push(context, MaterialPageRoute(builder: (_) => Admin()));
+                        }
+                        else {
+                          openingDemoStore(context);
+                        }
 
+                      }*/
+
+                      Navigator.push(context, MaterialPageRoute(builder: (_) => Admin()));
                     },
                     child:  Text('Login', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w500),),
                   ),

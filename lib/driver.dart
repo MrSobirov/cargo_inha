@@ -46,7 +46,12 @@ class _DriverState extends State<Driver> {
     String status = "Choose status";
     return  Scaffold(
       body: Container(
-          height: 500,
+          decoration: BoxDecoration(
+            image: DecorationImage(
+                image: AssetImage("assets/admin_background.jpg"),
+                fit: BoxFit.cover),
+          ),
+          height: double.infinity,
           padding: EdgeInsets.all(16),
           child: ListView.builder(
               itemCount: items.length,
