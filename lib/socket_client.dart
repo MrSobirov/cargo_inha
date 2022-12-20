@@ -21,7 +21,7 @@ class SocketService {
       // listen to the received data event stream
       socket!.listen((List<int> event) {
         log("Result is empty: ${event.isEmpty}");
-        //data = String.fromCharCodes(event);
+        data = String.fromCharCodes(event);
         log("Response data: $data");
       });
       return true;
@@ -32,21 +32,57 @@ class SocketService {
     }
   }
 
-  Users login(String name, String password) {
+  Users? login(String name, String password) {
     socket!.add(utf8.encode("SELECT JSON_ARRAYAGG(JSON_OBJECT('name', name, 'id', id, 'type', type)) from users where name = $name and password = $password;"));
-    data = '[{"id": 1, "name": "Ibrohim driver", "type": "driver"}]';
-    return usersFromJson(data)[0];
+    try{
+      return usersFromJson(data)[0];
+    } catch(error) {
+      return null;
+    }
   }
 
   List<Users> getDrivers() {
     socket!.add(utf8.encode("SELECT JSON_ARRAYAGG(JSON_OBJECT('name', name, 'id', id, 'type', type)) from users where type = 'driver';"));
-    data = '[{"id": 1, "name": "Ibrohim driver", "type": "driver"}]';
-    return usersFromJson(data);
+    try {
+      return usersFromJson(data);
+    } catch(error) {
+      return [];
+    }
   }
 
   List<Orders> getOrders() {
     socket!.add(utf8.encode("SELECT JSON_ARRAYAGG(JSON_OBJECT('id', id, 'company', company, 'address', address, 'phone', phone, 'date', date, 'status', status, 'driver_id', driver_id, 'distance', distance,)) from orders;"));
-    data = '[{"id": 1, "phone": "946590850", "company": "Artel", "driver_id": 1}, {"id": 2, "phone": "946590851", "company": "Akfa", "driver_id": 2}]';
-    return ordersFromJson(data);
+    try {
+      return ordersFromJson(data);
+    } catch(error) {
+      return [];
+    }
+  }
+
+  List<Orders> createOrder(Map<String, dynamic> body) {
+    String values = '${body["id"]}, ${body["company"]}, ${body["address"]}, ${body["phone"]}, ${body["date"]}, ${body["status"]}, ${body["distance"]}, ${body["driver_id"]}, ';
+    socket!.add(utf8.encode("INSERT INTO orders VALUES ($values)"));
+    return getOrders();
+  }
+
+  List<Orders> assignDriver(int id, int driverID) {
+    socket!.add(utf8.encode("UPDATE orders set driver_id = $driverID where id = $id"));
+    return getOrders();
+  }
+
+  List<Orders> blockOrder(int id, bool blocked) {
+    socket!.add(utf8.encode("UPDATE orders set status = ${blocked ? "block" : "pending"} where id = $id"));
+    return getOrders();
+  }
+
+  List<Orders> changeStatus(int id, String currentStatus) {
+    Map<String, String> statuses = {
+      "pending": "accepted",
+      "accepted": "on_the_way",
+      "on_the_way": "finished"
+    };
+    String newStatus = statuses[currentStatus] ?? 'NULL';
+    socket!.add(utf8.encode("UPDATE orders set status = $newStatus where id = $id"));
+    return getOrders();
   }
 }
