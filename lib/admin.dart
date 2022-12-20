@@ -7,7 +7,7 @@ class Admin extends StatefulWidget {
 }
 String? dropdownValue;
 List<String> items =[
-  "Sekn", "Ultr"
+  "Shermat", "Oybek"
 ];
 
 List<Map> users = [];
