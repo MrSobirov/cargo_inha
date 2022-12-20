@@ -200,7 +200,7 @@ class _LoginState extends State<Login> {
                       ),
                     ),
                     onPressed: ()  {
-                      /*if(tabTextIndexSelected == 1 ) {
+                      if(tabTextIndexSelected == 1 ) {
                         if(name.text == "Muhammadsaid" && phone.text == "993466246"){
                           Navigator.push(context, MaterialPageRoute(builder: (_) => Driver()));
                         }
@@ -216,9 +216,8 @@ class _LoginState extends State<Login> {
                           openingDemoStore(context);
                         }
 
-                      }*/
+                      }
 
-                      Navigator.push(context, MaterialPageRoute(builder: (_) => Admin()));
                     },
                     child:  Text('Login', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w500),),
                   ),
