@@ -1,8 +1,8 @@
 import 'dart:convert';
 
-List<Users> welcomeFromJson(String str) => List<Users>.from(json.decode(str).map((x) => Users.fromJson(x)));
+List<Users> usersFromJson(String str) => List<Users>.from(json.decode(str).map((x) => Users.fromJson(x)));
 
-String welcomeToJson(List<Users> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
+List<Orders> ordersFromJson(String str) => List<Orders>.from(json.decode(str).map((x) => Orders.fromJson(x)));
 
 class Users {
   Users({
@@ -20,17 +20,7 @@ class Users {
     name: json["name"],
     type: json["type"],
   );
-
-  Map<String, dynamic> toJson() => {
-    "id": id,
-    "name": name,
-    "type": type,
-  };
 }
-
-List<Orders> ordersFromJson(String str) => List<Orders>.from(json.decode(str).map((x) => Orders.fromJson(x)));
-
-String ordersToJson(List<Orders> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
 class Orders {
   Orders({
@@ -63,15 +53,4 @@ class Orders {
     company: json["company"],
     driverId: json["driver_id"],
   );
-
-  Map<String, dynamic> toJson() => {
-    "id": id,
-    "address": address,
-    "phone": phone,
-    "date": date,
-    "status": status,
-    "distance": distance,
-    "company": company,
-    "driver_id": driverId,
-  };
 }
