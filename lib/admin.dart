@@ -1,3 +1,4 @@
+import 'package:cargo_inha/models.dart';
 import 'package:flutter/material.dart';
 class Admin extends StatefulWidget {
   const Admin({Key? key}) : super(key: key);
@@ -7,16 +8,22 @@ class Admin extends StatefulWidget {
 }
 String? dropdownValue;
 List<String> items =[
-  "Shermat", "Oybek"
+  "Sherman", "Aybek"
 ];
 
-List<Map> users = [];
+List<Users> users = [];
 
 int count = 0;
 class _AdminState extends State<Admin> {
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    //users = nmadur();
+  }
+  @override
   Widget build(BuildContext context) {
-
+    //users[1].company = items;
     List<Map> orders = List<Map>.filled(count, {
      "name" : TextEditingController(),
       "phone" :TextEditingController(),
