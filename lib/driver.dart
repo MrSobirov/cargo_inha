@@ -1,3 +1,4 @@
+import 'package:cargo_inha/socket_client.dart';
 import 'package:flutter/material.dart';
 
 import 'models.dart';
@@ -16,6 +17,7 @@ class _DriverState extends State<Driver> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    orders = SocketService().getOrders();
 
   }
   Widget build(BuildContext context) {

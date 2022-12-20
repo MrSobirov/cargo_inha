@@ -1,7 +1,10 @@
 import 'package:cargo_inha/admin.dart';
 import 'package:cargo_inha/driver.dart';
+import 'package:cargo_inha/socket_client.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_toggle_tab/flutter_toggle_tab.dart';
+
+import 'models.dart';
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
 
@@ -202,8 +205,9 @@ class _LoginState extends State<Login> {
                       ),
                     ),
                     onPressed: ()  {
+                      Users? user = SocketService().login(name.text, phone.text);
                       if(tabTextIndexSelected == 1 ) {
-                        if(name.text == "Muhammadsaid" && phone.text == "993466246"){
+                        if(user != null){
                           Navigator.push(context, MaterialPageRoute(builder: (_) => Driver()));
                         }
                         else {
@@ -211,7 +215,7 @@ class _LoginState extends State<Login> {
                         }
                       }
                       else {
-                        if(name.text == "Muhammadsaid" && phone.text == "993466246") {
+                        if(user != null) {
                           Navigator.push(context, MaterialPageRoute(builder: (_) => Admin()));
                         }
                         else {

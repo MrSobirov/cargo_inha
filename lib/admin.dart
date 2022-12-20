@@ -1,4 +1,5 @@
 import 'package:cargo_inha/models.dart';
+import 'package:cargo_inha/socket_client.dart';
 import 'package:flutter/material.dart';
 class Admin extends StatefulWidget {
   const Admin({Key? key}) : super(key: key);
@@ -7,9 +8,7 @@ class Admin extends StatefulWidget {
   State<Admin> createState() => _AdminState();
 }
 String? dropdownValue;
-List<String> items =[
-  "Sherman", "Aybek"
-];
+List<String> items =[];
 
 List<Users> users = [];
 
@@ -19,7 +18,7 @@ class _AdminState extends State<Admin> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    //users = nmadur();
+    users = SocketService().getDrivers();
   }
   @override
   Widget build(BuildContext context) {
@@ -29,7 +28,6 @@ class _AdminState extends State<Admin> {
       "phone" :TextEditingController(),
       "date" : TextEditingController(),
     });
-
     print(orders);
     return Scaffold(
       body: Container(
@@ -44,6 +42,7 @@ class _AdminState extends State<Admin> {
         child: ListView.builder(
           itemCount: count,
             itemBuilder: (context , index) {
+              items.add(users[index].name);
               return Row(
                 children: [
                   Container(
