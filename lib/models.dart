@@ -12,7 +12,7 @@ class Users {
   });
 
   int id;
-  String name;
+  String? name;
   String type;
 
   factory Users.fromJson(Map<String, dynamic> json) => Users(

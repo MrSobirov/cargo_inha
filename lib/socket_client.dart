@@ -32,8 +32,8 @@ class SocketService {
     }
   }
 
-  Users? login(String name, String password) {
-    socket!.add(utf8.encode("SELECT JSON_ARRAYAGG(JSON_OBJECT('name', name, 'id', id, 'type', type)) from users where name = $name and password = $password;"));
+  Users? login(String name, String password, String type) {
+    socket!.add(utf8.encode("SELECT JSON_ARRAYAGG(JSON_OBJECT('name', name, 'id', id, 'type', type)) from users where name = $name and password = $password and type = $type;"));
     try{
       return usersFromJson(data)[0];
     } catch(error) {
@@ -60,29 +60,29 @@ class SocketService {
   }
 
   List<Orders> createOrder(Map<String, dynamic> body) {
-    String values = '${body["id"]}, ${body["company"]}, ${body["address"]}, ${body["phone"]}, ${body["date"]}, ${body["status"]}, ${body["distance"]}, ${body["driver_id"]}, ';
-    socket!.add(utf8.encode("INSERT INTO orders VALUES ($values)"));
+    String values = '${body["id"]}, ${body["company"]}, ${body["address"]}, ${body["phone"]}, ${body["date"]}, ${body["status"]}, ${body["distance"]}, ${body["driver_id"]};';
+    socket!.add(utf8.encode("INSERT INTO orders VALUES ($values);"));
     return getOrders();
   }
 
   List<Orders> assignDriver(int id, int driverID) {
-    socket!.add(utf8.encode("UPDATE orders set driver_id = $driverID where id = $id"));
+    socket!.add(utf8.encode("UPDATE orders set driver_id = $driverID where id = $id;"));
     return getOrders();
   }
 
   List<Orders> blockOrder(int id, bool blocked) {
-    socket!.add(utf8.encode("UPDATE orders set status = ${blocked ? "block" : "pending"} where id = $id"));
+    socket!.add(utf8.encode("UPDATE orders set status = ${blocked ? "block" : "pending"} where id = $id;"));
     return getOrders();
   }
 
   List<Orders> changeStatus(int id, String currentStatus) {
     Map<String, String> statuses = {
-      "pending": "accepted",
-      "accepted": "on_the_way",
-      "on_the_way": "finished"
+      "Pending": "Accepted",
+      "Accepted": "On the way",
+      "On the way": "Finished",
     };
     String newStatus = statuses[currentStatus] ?? 'NULL';
-    socket!.add(utf8.encode("UPDATE orders set status = $newStatus where id = $id"));
+    socket!.add(utf8.encode("UPDATE orders set status = $newStatus where id = $id;"));
     return getOrders();
   }
 }

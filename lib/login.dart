@@ -14,73 +14,60 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   int tabTextIndexSelected = 0;
-  final TextEditingController phone = TextEditingController();
+  final TextEditingController password = TextEditingController();
   final TextEditingController name = TextEditingController();
 
-  bool openingDemoStore(BuildContext ctx) {
-    bool needDemo = false;
+  @override
+  void initState() {
+    super.initState();
+    connectServer();
+  }
+
+  void connectServer() async {
+    await SocketService().connect();
+  }
+
+  void loginError(BuildContext ctx) {
     showDialog<void>(
       context: ctx,
       builder: (BuildContext contextDialog) {
-        return WillPopScope(
-          onWillPop: () async {
-            Navigator.push;
-            return false;
-          },
-          child: AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(28))),
-            title: Text(
-              "Login error !",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 18
-              ),
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(28))),
+          title: Text(
+            "Login error !",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+                color: Colors.black,
+                fontSize: 18
             ),
-            content: Text(
-              "Email or password was incorrect\nPlease try again !.",
-              //textAlign: TextAlign.center,
-              style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 15
-              ),
-            ),
-            actions: <Widget>[
-              /*TextButton(
-                style: TextButton.styleFrom(textStyle: Theme.of(contextDialog).textTheme.labelLarge,),
-                child: Text(
-                  'Check demo',
-                  style: TextStyle(
-                      fontSize: 15.sp,
-                      fontWeight: FontWeight.w600,
-                      color: MyColors.primary
-                  ),
-                ),
-                onPressed: () async {
-                  Navigator.pop(contextDialog);
-                  needDemo = true;
-                },
-              ),*/
-              TextButton(
-                style: TextButton.styleFrom(textStyle: Theme.of(contextDialog).textTheme.labelLarge,),
-                child: Text(
-                  'OK',
-                  style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.blueAccent
-                  ),
-                ),
-                onPressed: () {
-                  Navigator.pop(ctx);
-                },
-              ),
-            ],
           ),
+          content: Text(
+            "Email or password was incorrect\nPlease try again !",
+            //textAlign: TextAlign.center,
+            style: TextStyle(
+                color: Colors.black,
+                fontSize: 15
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              style: TextButton.styleFrom(textStyle: Theme.of(contextDialog).textTheme.labelLarge,),
+              child: Text(
+                'OK',
+                style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black
+                ),
+              ),
+              onPressed: () async {
+                Navigator.pop(contextDialog);
+              },
+            ),
+          ],
         );
       },
     );
-    return needDemo;
   }
 
   @override
@@ -102,9 +89,7 @@ class _LoginState extends State<Login> {
               children: [
                 SizedBox(height: 300,),
                 FlutterToggleTab(
-                  unSelectedBackgroundColors: [
-                    Color.fromRGBO(245, 245, 245, 1)],
-
+                  unSelectedBackgroundColors: [Color.fromRGBO(245, 245, 245, 1)],
                   marginSelected: EdgeInsets.all(5),
                   width: 40,
                   borderRadius: 30,
@@ -127,35 +112,27 @@ class _LoginState extends State<Login> {
                   },
                   isScroll: true,
                 ),
-
-                  Container(
-                    width: 358,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color : Colors.black),
-                    ),
-                    margin: EdgeInsets.only(top : 50 ,bottom: 16),
-                    padding: EdgeInsets.only(left: 16,),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: TextFormField(
-                            decoration: InputDecoration(
-                              suffixStyle: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 15
-                              ),
-                              hintText: 'Email',
-                              // contentPadding: EdgeInsets.only(top: 0.1),
-                              border: InputBorder.none,
-                            ),
-                            controller: name,
-                          ),
-                        ),
-                      ],
-                    ),
+                Container(
+                  width: 358,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color : Colors.black),
                   ),
-
+                  margin: EdgeInsets.only(top : 50 ,bottom: 16),
+                  padding: EdgeInsets.only(left: 16,),
+                  child: TextFormField(
+                    style: TextStyle(color: Colors.red),
+                    decoration: InputDecoration(
+                      suffixStyle: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 15
+                      ),
+                      hintText: 'Name',
+                      border: InputBorder.none,
+                    ),
+                    controller: name,
+                  ),
+                ),
                 Container(
                   width: 358,
                   decoration: BoxDecoration(
@@ -164,34 +141,19 @@ class _LoginState extends State<Login> {
                   ),
                   margin: EdgeInsets.only(bottom:  50),
                   padding: EdgeInsets.only(left: 16,),
-                  child: Row(
-                    children: [
-                      Text(
-                        "+998 | ",
-                        style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 17
-                        ),
+                  child: TextFormField(
+                    keyboardType: TextInputType.phone,
+                    style: TextStyle(color: Colors.red),
+                    decoration: InputDecoration(
+                      suffixStyle: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 15
                       ),
-                      Expanded(
-                        child: TextFormField(
-                          keyboardType: TextInputType.phone,
-                          decoration: InputDecoration(
-                            suffixStyle: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 15
-                            ),
-                            hintText: 'Phone',
-                            // contentPadding: EdgeInsets.only(top: 0.1),
-                            border: InputBorder.none,
-                          ),
-                          controller: phone,
-                        ),
-                      ),
-
-                    ],
+                      hintText: 'Password',
+                      border: InputBorder.none,
+                    ),
+                    controller: password,
                   ),
-
                 ),
                 Container(
                   height: 46,
@@ -205,31 +167,16 @@ class _LoginState extends State<Login> {
                       ),
                     ),
                     onPressed: ()  {
-                      Users? user = SocketService().login(name.text, phone.text);
-                      if(tabTextIndexSelected == 1 ) {
-                        if(user != null){
-                          Navigator.push(context, MaterialPageRoute(builder: (_) => Driver()));
-                        }
-                        else {
-                          openingDemoStore(context);
-                        }
+                      Users? user = SocketService().login(name.text, password.text, tabTextIndexSelected == 1 ? "driver": "admin");
+                      if(user != null){
+                        Navigator.push(context, MaterialPageRoute(builder: (_) => user.type == "driver" ? Driver() : Admin()));
+                      } else {
+                        loginError(context);
                       }
-                      else {
-                        if(user != null) {
-                          Navigator.push(context, MaterialPageRoute(builder: (_) => Admin()));
-                        }
-                        else {
-                          openingDemoStore(context);
-                        }
-
-                      }
-
                     },
-                    child:  Text('Login', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w500),),
+                    child: Text('Login', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w500),),
                   ),
                 ),
-
-
               ],
             ),
           ),

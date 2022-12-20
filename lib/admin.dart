@@ -1,5 +1,6 @@
 import 'package:cargo_inha/models.dart';
 import 'package:cargo_inha/socket_client.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 class Admin extends StatefulWidget {
   const Admin({Key? key}) : super(key: key);
@@ -7,29 +8,114 @@ class Admin extends StatefulWidget {
   @override
   State<Admin> createState() => _AdminState();
 }
-String? dropdownValue;
-List<String> items =[];
 
-List<Users> users = [];
-
-int count = 0;
 class _AdminState extends State<Admin> {
+  String? driverName;
+  List<Orders> orders = [];
+  List<Users> drivers = [];
+  List<String> items = [];
+
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    users = SocketService().getDrivers();
+    initialize();
   }
+
+  void initialize() {
+    drivers = SocketService().getDrivers();
+    orders = SocketService().getOrders();
+    for (var value in drivers) {
+      String? a = value.name;
+      if(a != null) items.add(a);
+    }
+    setState(() {});
+  }
+
+  void addOrder(BuildContext ctx) {
+    List<TextEditingController> controllers = [
+      for (int i = 0; i < 6; i++)
+        TextEditingController()
+    ];
+
+    showDialog<void>(
+      context: ctx,
+      builder: (BuildContext contextDialog) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(28))),
+          title: Text(
+            "Add new order",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+                color: Colors.black,
+                fontSize: 18
+            ),
+          ),
+          content: Column(
+            children: [
+              TTF("Order ID", controllers[0], numeric: true),
+              TTF("Company name", controllers[1]),
+              TTF("Customer Phone", controllers[2]),
+              TTF("Order Date", controllers[3]),
+              TTF("Shipping address", controllers[4]),
+              TTF("Shipping distance", controllers[5], numeric: true),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              style: TextButton.styleFrom(textStyle: Theme.of(contextDialog).textTheme.labelLarge,),
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black
+                ),
+              ),
+              onPressed: () async {
+                Navigator.pop(contextDialog);
+              },
+            ),
+            TextButton(
+              style: TextButton.styleFrom(textStyle: Theme.of(contextDialog).textTheme.labelLarge,),
+              child: Text(
+                'Create',
+                style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black
+                ),
+              ),
+              onPressed: () async {
+                Map<String, dynamic> body = {
+                  "id": int.parse(controllers[0].text),
+                  "company": controllers[1].text,
+                  "phone": controllers[2].text,
+                  "date": controllers[3].text,
+                  "address": controllers[4].text,
+                  "distance": int.parse(controllers[5].text),
+                  "driver_id": 0,
+                  "status": "Pending",
+                };
+                orders = SocketService().createOrder(body);
+                setState(() {});
+                Navigator.pop(contextDialog);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    //users[1].company = items;
-    List<Map> orders = List<Map>.filled(count, {
-     "name" : TextEditingController(),
-      "phone" :TextEditingController(),
-      "date" : TextEditingController(),
-    });
-    print(orders);
     return Scaffold(
+      appBar: AppBar(
+        title: Text("Admin dashboard"),
+        actions: [
+          IconButton(onPressed: initialize, icon: Icon(Icons.update))
+        ],
+      ),
       body: Container(
           decoration: BoxDecoration(
             image: DecorationImage(
@@ -40,154 +126,123 @@ class _AdminState extends State<Admin> {
         height: double.infinity,
         width: double.infinity,
         child: ListView.builder(
-          itemCount: count,
-            itemBuilder: (context , index) {
-              items.add(users[index].name);
-              return Row(
-                children: [
-                  Container(
-                    margin: EdgeInsets.only(left: 8,bottom: 8),
-                    padding: EdgeInsets.only(bottom: 5,left: 5),
-                    decoration: BoxDecoration(
+          itemCount: orders.length,
+          itemBuilder: (context, index) {
+            Orders orderItem = orders[0];
+            driverName = drivers.firstWhere((element) => element.id == orderItem.driverId, orElse: () => Users(id: 0, name: null, type: "driver")).name;
+            bool blocked = orderItem.status == "block";
+            return Row(
+              children: [
+                DataTable(
+                  columns: [
+                    DataColumn(label: Text("ID")),
+                    DataColumn(label: Text("Company name")),
+                    DataColumn(label: Text("Phone number")),
+                    DataColumn(label: Text("Date")),
+                    DataColumn(label: Text("Address")),
+                    DataColumn(label: Text("Distance")),
+                    DataColumn(label: Text("Status")),
+                  ],
+                  rows: [
+                    DataRow(
+                      selected: true,
+                      cells: [
+                        DataCell(Text(orderItem.id.toString())),
+                        DataCell(Text(orderItem.company)),
+                        DataCell(Text(orderItem.phone)),
+                        DataCell(Text(orderItem.date)),
+                        DataCell(Text(orderItem.address)),
+                        DataCell(Text(orderItem.distance.toString())),
+                        DataCell(Text(orderItem.status)),
+                      ],
+                    ),
+                  ],
+                ),
+                Text("Assign"),
+                Container(
+                  height: 35,
+                  width: 100,
+                  margin: EdgeInsets.only(left: 8,bottom: 8),
+                  padding: EdgeInsets.only(bottom: 5,left: 5),
+                  decoration: BoxDecoration(
                       border: Border.all(
-                        color: Colors.black
+                          color: Colors.black
                       ),
                       borderRadius: BorderRadius.circular(5)
-                    ),
-                    height: 35,
-                    width: 300,
-                    child: TextFormField(
-                      decoration: InputDecoration(
-                        suffixStyle: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 15
-                        ),
-                        hintText: 'Name',
-                        // contentPadding: EdgeInsets.only(top: 0.1),
-                        border: InputBorder.none,
-                      ),
-                      controller: orders[index]["name"],
-                    ),
                   ),
-                  Container(
-                    margin: EdgeInsets.only(left: 8,bottom: 8),
-                    padding: EdgeInsets.only(bottom: 5,left: 5),
-                    decoration: BoxDecoration(
-                        border: Border.all(
-                            color: Colors.black
-                        ),
-                        borderRadius: BorderRadius.circular(5)
-                    ),
-                    height: 35,
-                    width: 300,
-                    child: TextFormField(
-                      decoration: InputDecoration(
-                        suffixStyle: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 15
-                        ),
-                        hintText: 'Phone number',
-                        // contentPadding: EdgeInsets.only(top: 0.1),
-                        border: InputBorder.none,
-                      ),
-                      controller: orders[index]["phone"],
-                    ),
+                  child: DropdownButton(
+                    underline: SizedBox(),
+                    value: driverName,
+                    icon: const Icon(Icons.keyboard_arrow_down),
+                    items: items.map((String items) {
+                      return DropdownMenuItem(
+                        value: items,
+                        child: Text(items),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      int newDriverID = drivers.firstWhere((element) => element.name == newValue).id;
+                      orders = SocketService().assignDriver(orderItem.id, newDriverID);
+                      driverName = newValue!;
+                      setState(() {});
+                    },
                   ),
-                  Container(
-                    margin: EdgeInsets.only(left: 8,bottom: 8),
-                    padding: EdgeInsets.only(bottom: 5,left: 5),
-                    decoration: BoxDecoration(
-                        border: Border.all(
-                            color: Colors.black
-                        ),
-                        borderRadius: BorderRadius.circular(5)
-                    ),
-                    height: 35,
-                    width: 300,
-                    child: TextFormField(
-                      decoration: InputDecoration(
-                        suffixStyle: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 15
-                        ),
-                        hintText: 'Date',
-                        // contentPadding: EdgeInsets.only(top: 0.1),
-                        border: InputBorder.none,
-                      ),
-                      controller: orders[index]["date"],
-                    ),
-                  ),
-                  Container(
-                    height: 35,
-                    width: 100,
-                    margin: EdgeInsets.only(left: 8,bottom: 8),
-                    padding: EdgeInsets.only(bottom: 5,left: 5),
-                    decoration: BoxDecoration(
-                        border: Border.all(
-                            color: Colors.black
-                        ),
-                        borderRadius: BorderRadius.circular(5)
-                    ),
-                    child: DropdownButton(
-                      underline: SizedBox(),
-                      // Initial Value
-                      value: dropdownValue,
-
-                      // Down Arrow Icon
-                      icon: const Icon(Icons.keyboard_arrow_down),
-
-                      // Array list of items
-                      items: items.map((String items) {
-                        return DropdownMenuItem(
-                          value: items,
-                          child: Text(items),
-                        );
-                      }).toList(),
-                      // After selecting the desired option,it will
-                      // change button value to selected value
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          dropdownValue = newValue!;
-                        });
-                      },
-                    ),
-                  ),
-                  Container(
-                    height: 35,
-                    width: 150,
-                    margin: EdgeInsets.only(left: 8,bottom: 8),
-                    padding: EdgeInsets.only(bottom: 5,left: 5),
-                    decoration: BoxDecoration(
-                        color: Color.fromRGBO(0, 35, 184, 1),
-                        border: Border.all(
-                            color: Colors.black
-                        ),
-                        borderRadius: BorderRadius.circular(5)
-                    ),
-                    child: Center(
-                      child: Text("Send",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w400,
-                        fontSize: 18,
-                        color: Colors.white
-                      ),),
-                    ),
+                ),
+                Text("Block"),
+                Container(
+                  height: 25,
+                  width: 80,
+                  child: CupertinoSwitch(
+                    value: blocked,
+                    activeColor: Colors.green,
+                    onChanged: (newVal) {
+                      orders = SocketService().blockOrder(orderItem.id, newVal);
+                      setState(() {});
+                    },
                   )
-                ],
-              );
-            })
+                ),
+              ],
+            );
+          },
+        ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: ((){
-          setState(() {
-            count++;
-          });
-        }),
+        onPressed: () {
+
+        },
         tooltip: 'Add order',
         child: const Icon(
           Icons.add_task,
           color: Color.fromRGBO(0, 35, 184, 1),
         ),
+      ),
+    );
+  }
+
+  Widget TTF(String hint, TextEditingController ctr, {bool numeric = false}) {
+    return Container(
+      margin: EdgeInsets.only(left: 8,bottom: 8),
+      padding: EdgeInsets.only(bottom: 5,left: 5),
+      decoration: BoxDecoration(
+          border: Border.all(
+              color: Colors.black
+          ),
+          borderRadius: BorderRadius.circular(5)
+      ),
+      height: 35,
+      width: 300,
+      child: TextFormField(
+        keyboardType: numeric ? TextInputType.number : TextInputType.name,
+        decoration: InputDecoration(
+          suffixStyle: TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 15
+          ),
+          hintText: hint,
+          // contentPadding: EdgeInsets.only(top: 0.1),
+          border: InputBorder.none,
+        ),
+        controller: ctr,
       ),
     );
   }
