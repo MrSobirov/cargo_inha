@@ -2,6 +2,8 @@ import 'package:cargo_inha/models.dart';
 import 'package:cargo_inha/socket_client.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'dart:developer';
+
 class Admin extends StatefulWidget {
   final Users admin;
   const Admin(this.admin, {Key? key}) : super(key: key);
@@ -19,17 +21,29 @@ class _AdminState extends State<Admin> {
   @override
   void initState() {
     super.initState();
-    initialize();
+    initialize(needDRV: true);
   }
 
-  void initialize() {
-    drivers = SocketService().getDrivers();
-    orders = SocketService().getOrders();
-    for (var value in drivers) {
-      String? a = value.name;
-      if(a != null) items.add(a);
+  void initialize({bool needDRV = false}) {
+    if(needDRV) {
+      drivers = SocketService().getDrivers();
+      items.clear();
+      log("Driverrrrrrr");
+      log(drivers.isEmpty.toString());
+      for (var value in drivers) {
+        String? a = value.name;
+        log(a.toString());
+        if(a != null) items.add(a);
+      }
     }
+    orders = SocketService().getOrders();
+    log("here7777");
     setState(() {});
+  }
+
+  void connect() {
+    SocketService().connect();
+    initialize(needDRV: true);
   }
 
   void addOrder(BuildContext ctx) {
@@ -114,7 +128,8 @@ class _AdminState extends State<Admin> {
       appBar: AppBar(
         title: Text("${widget.admin.name} dashboard"),
         actions: [
-          IconButton(onPressed: initialize, icon: Icon(Icons.update))
+          IconButton(onPressed: initialize, icon: Icon(Icons.update)),
+          IconButton(onPressed: connect, icon: Icon(Icons.connected_tv)),
         ],
       ),
       body: Container(
@@ -129,87 +144,91 @@ class _AdminState extends State<Admin> {
         child: ListView.builder(
           itemCount: orders.length,
           itemBuilder: (context, index) {
-            Orders orderItem = orders[0];
+            Orders orderItem = orders[index];
             driverName = drivers.firstWhere((element) => element.id == orderItem.driverId, orElse: () => Users(id: 0, name: null, type: "driver")).name;
             bool blocked = orderItem.status == "block";
-            return Row(
-              children: [
-                DataTable(
-                  columns: [
-                    DataColumn(label: Text("ID")),
-                    DataColumn(label: Text("Company name")),
-                    DataColumn(label: Text("Phone number")),
-                    DataColumn(label: Text("Date")),
-                    DataColumn(label: Text("Address")),
-                    DataColumn(label: Text("Distance")),
-                    DataColumn(label: Text("Status")),
-                  ],
-                  rows: [
-                    DataRow(
-                      selected: true,
-                      cells: [
-                        DataCell(Text(orderItem.id.toString())),
-                        DataCell(Text(orderItem.company)),
-                        DataCell(Text(orderItem.phone)),
-                        DataCell(Text(orderItem.date)),
-                        DataCell(Text(orderItem.address)),
-                        DataCell(Text(orderItem.distance.toString())),
-                        DataCell(Text(orderItem.status)),
-                      ],
-                    ),
-                  ],
-                ),
-                Text("Assign"),
-                Container(
-                  height: 35,
-                  width: 100,
-                  margin: EdgeInsets.only(left: 8,bottom: 8),
-                  padding: EdgeInsets.only(bottom: 5,left: 5),
-                  decoration: BoxDecoration(
-                      border: Border.all(
-                          color: Colors.black
+            return SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  DataTable(
+                    columns: [
+                      DataColumn(label: Text("ID")),
+                      DataColumn(label: Text("Company name")),
+                      DataColumn(label: Text("Phone number")),
+                      DataColumn(label: Text("Date")),
+                      DataColumn(label: Text("Address")),
+                      DataColumn(label: Text("Distance")),
+                      DataColumn(label: Text("Status")),
+                    ],
+                    rows: [
+                      DataRow(
+                        selected: true,
+                        cells: [
+                          DataCell(Text(orderItem.id.toString())),
+                          DataCell(Text(orderItem.company)),
+                          DataCell(Text(orderItem.phone)),
+                          DataCell(Text(orderItem.date)),
+                          DataCell(Text(orderItem.address)),
+                          DataCell(Text(orderItem.distance.toString())),
+                          DataCell(Text(orderItem.status)),
+                        ],
                       ),
-                      borderRadius: BorderRadius.circular(5)
+                    ],
                   ),
-                  child: DropdownButton(
-                    underline: SizedBox(),
-                    value: driverName,
-                    icon: const Icon(Icons.keyboard_arrow_down),
-                    items: items.map((String items) {
-                      return DropdownMenuItem(
-                        value: items,
-                        child: Text(items),
-                      );
-                    }).toList(),
-                    onChanged: (String? newValue) {
-                      int newDriverID = drivers.firstWhere((element) => element.name == newValue).id;
-                      orders = SocketService().assignDriver(orderItem.id, newDriverID);
-                      driverName = newValue!;
-                      setState(() {});
-                    },
+                  Text("Assign"),
+                  Container(
+                    height: 35,
+                    width: 100,
+                    margin: EdgeInsets.only(left: 8,bottom: 8),
+                    padding: EdgeInsets.only(bottom: 5,left: 5),
+                    decoration: BoxDecoration(
+                        border: Border.all(
+                            color: Colors.black
+                        ),
+                        borderRadius: BorderRadius.circular(5)
+                    ),
+                    child: DropdownButton(
+                      underline: SizedBox(),
+                      value: driverName,
+                      icon: const Icon(Icons.keyboard_arrow_down),
+                      items: items.map((String items) {
+                        return DropdownMenuItem(
+                          value: items,
+                          child: Text(items),
+                        );
+                      }).toList(),
+                      onChanged: (String? newValue) {
+                        int newDriverID = drivers.firstWhere((element) => element.name == newValue).id;
+                        orders = SocketService().assignDriver(orderItem.id, newDriverID);
+                        driverName = newValue!;
+                        setState(() {});
+                      },
+                    ),
                   ),
-                ),
-                Text("Block"),
-                Container(
-                  height: 25,
-                  width: 80,
-                  child: CupertinoSwitch(
-                    value: blocked,
-                    activeColor: Colors.green,
-                    onChanged: (newVal) {
-                      orders = SocketService().blockOrder(orderItem.id, newVal);
-                      setState(() {});
-                    },
-                  )
-                ),
-              ],
+                  Text("Block"),
+                  Container(
+                    height: 25,
+                    width: 80,
+                    child: CupertinoSwitch(
+                      value: blocked,
+                      activeColor: Colors.green,
+                      onChanged: (newVal) {
+                        orders = SocketService().blockOrder(orderItem.id, newVal);
+                        blocked = newVal;
+                        setState(() {});
+                      },
+                    )
+                  ),
+                ],
+              ),
             );
           },
         ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-
+          addOrder(context);
         },
         tooltip: 'Add order',
         child: const Icon(

@@ -121,7 +121,7 @@ class _LoginState extends State<Login> {
                   margin: EdgeInsets.only(top : 50 ,bottom: 16),
                   padding: EdgeInsets.only(left: 16,),
                   child: TextFormField(
-                    style: TextStyle(color: Colors.red),
+                    style: TextStyle(color: Colors.white),
                     decoration: InputDecoration(
                       suffixStyle: TextStyle(
                           fontWeight: FontWeight.w600,
@@ -142,8 +142,8 @@ class _LoginState extends State<Login> {
                   margin: EdgeInsets.only(bottom:  50),
                   padding: EdgeInsets.only(left: 16,),
                   child: TextFormField(
-                    keyboardType: TextInputType.phone,
-                    style: TextStyle(color: Colors.red),
+
+                    style: TextStyle(color: Colors.white),
                     decoration: InputDecoration(
                       suffixStyle: TextStyle(
                           fontWeight: FontWeight.w600,
