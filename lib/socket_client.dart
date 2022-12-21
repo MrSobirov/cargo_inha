@@ -12,7 +12,7 @@ class SocketService {
     try {
       log("started");
       socket = await Socket.connect(
-          '192.168.192.114',
+          '192.168.192.114',  //define server ip address
           8000,
           timeout: const Duration(seconds: 10)
       );
@@ -50,8 +50,8 @@ class SocketService {
     }
   }
 
-  List<Orders> getOrders() {
-    socket!.add(utf8.encode("SELECT JSON_ARRAYAGG(JSON_OBJECT('id', id, 'company', company, 'address', address, 'phone', phone, 'date', date, 'status', status, 'driver_id', driver_id, 'distance', distance,)) from orders;"));
+  List<Orders> getOrders({int? id}) {
+    socket!.add(utf8.encode("SELECT JSON_ARRAYAGG(JSON_OBJECT('id', id, 'company', company, 'address', address, 'phone', phone, 'date', date, 'status', status, 'driver_id', driver_id, 'distance', distance,)) from orders${id == null ? "" : "where driver_id = $id and status != 'block'"};"));
     try {
       return ordersFromJson(data);
     } catch(error) {

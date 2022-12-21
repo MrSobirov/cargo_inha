@@ -3,7 +3,8 @@ import 'package:cargo_inha/socket_client.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 class Admin extends StatefulWidget {
-  const Admin({Key? key}) : super(key: key);
+  final Users admin;
+  const Admin(this.admin, {Key? key}) : super(key: key);
 
   @override
   State<Admin> createState() => _AdminState();
@@ -111,7 +112,7 @@ class _AdminState extends State<Admin> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Admin dashboard"),
+        title: Text("${widget.admin.name} dashboard"),
         actions: [
           IconButton(onPressed: initialize, icon: Icon(Icons.update))
         ],

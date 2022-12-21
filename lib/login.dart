@@ -169,7 +169,7 @@ class _LoginState extends State<Login> {
                     onPressed: ()  {
                       Users? user = SocketService().login(name.text, password.text, tabTextIndexSelected == 1 ? "driver": "admin");
                       if(user != null){
-                        Navigator.push(context, MaterialPageRoute(builder: (_) => user.type == "driver" ? Driver() : Admin()));
+                        Navigator.push(context, MaterialPageRoute(builder: (_) => user.type == "driver" ? Driver(user) : Admin(user)));
                       } else {
                         loginError(context);
                       }

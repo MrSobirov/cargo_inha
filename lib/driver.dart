@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 
 import 'models.dart';
 class Driver extends StatefulWidget {
-  const Driver({Key? key}) : super(key: key);
+  final Users driver;
+  const Driver(this.driver, {Key? key}) : super(key: key);
 
   @override
   State<Driver> createState() => _DriverState();
@@ -24,14 +25,14 @@ class _DriverState extends State<Driver> {
   }
 
   void initialize() {
-    orders = SocketService().getOrders();
+    orders = SocketService().getOrders(id: widget.driver.id);
     setState(() {});
   }
 
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Driver dashboard"),
+        title: Text("${widget.driver.name} dashboard"),
         actions: [
           IconButton(onPressed: initialize, icon: Icon(Icons.update))
         ],
